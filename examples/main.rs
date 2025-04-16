@@ -72,9 +72,15 @@ async fn get_gto(data: web::Json<GetGtoRequest>) -> impl Responder {
     hand_ranges.insert("BB", "22+,A2s+,A3s+,A4s+,A5s+,A6s+,A7s+,A8s+,A9s+,ATs+,K2s+,K3s+,K4s+,K5s+,K6s+,K7s+,K8s+,K9s+,Q2s+,Q3s+,Q4s+,Q5s+,Q6s+,Q7s+,Q8s+,Q9s+,J2s+,J3s+,J4s+,J5s+,J6s+,J7s+,J8s+,J9s+,T2s+,T3s+,T4s+,T5s+,T6s+,T7s+,T8s+,T9s,65s+,54s+,43s+,32s+,A2o+,A3o+,A4o+,A5o+,A6o+,A7o+,A8o+,A9o+,ATo+,K2o+,K3o+,K4o+,K5o+,K6o+,K7o+,K8o+,K9o+,Q2o+,Q3o+,Q4o+,Q5o+,Q6o+,Q7o+,Q8o+,Q9o+,J2o+,J3o+,J4o+,J5o+,J6o+,J7o+,J8o+,J9o,T2o+,T3o+,T4o+,T5o+,T6o+,T7o+,T8o+,T9o");
 
     let (ip_spt, opp_spt, user_index, opponent_index) = determine_position(&data.user_spt, &data.opponent_spt);
+    // 添加手牌到对应 range
+    let user_pos_str = if user_index == 0 { opp_spt } else { ip_spt };
+    let mut updated_range = hand_ranges[user_pos_str].to_string();
+    updated_range.push(',');
+    updated_range.push_str(&data.user_hand);
+    hand_ranges.insert(user_pos_str, Box::leak(updated_range.into_boxed_str()));
     let oop_range = hand_ranges[opp_spt];
     let ip_range = hand_ranges[ip_spt];
-    
+
     let card_config = CardConfig {
         range: [oop_range.parse().unwrap(), ip_range.parse().unwrap()],
         flop: flop_from_str(&data.flop).unwrap(),
