@@ -303,7 +303,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .route("/demo/getGto", web::post().to(get_gto))  // 使用 POST 请求
     })
-    .bind("127.0.0.1:8080")?
+    .bind("0.0.0.0:8080")?
     .run()
     .await
 }
